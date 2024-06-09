@@ -19,7 +19,7 @@ type HexDumpOptions struct {
 	AddressBytes      int
 }
 
-var DefaultHexDumpOptions = HexDumpOptions{
+var DefaultOptions = HexDumpOptions{
 	ShowHeader:        false,
 	ShowAddress:       true,
 	ShowByteSeparator: true,
@@ -31,7 +31,7 @@ var DefaultHexDumpOptions = HexDumpOptions{
 // Returns nil when succesfully written the data
 func Dump(filename string, w io.Writer, options ...HexDumpOptions) error {
 	// Handle default options and basic sanity check for options
-	opts := DefaultHexDumpOptions
+	opts := DefaultOptions
 	if len(options) > 1 {
 		return errors.New("can only specify one set of options")
 	}

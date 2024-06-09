@@ -13,8 +13,11 @@ Use the Dump function to write a hexdump to the provided io.Writer. Optionally p
 
 ## CLI Usage
 Install the latest version of __gohexd__ with:
+
 ```go install github.com/robkoster/hexdump/cmd/gohexd@latest```
+
 Run the following command to print a hexdump for any file
+
 ```gohexd <filename>```
 
 Optionally you can provide the following options:

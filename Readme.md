@@ -10,6 +10,8 @@ Use the Dump function to write a hexdump to the provided io.Writer. Optionally p
 |ShowByteSeparator|bool|Print a space between bytes|
 |BytesPerLine|int|Number of bytes to print per line|
 |AddressBytes|int|Number of bytes to use for displaying the address|
+|StartAddress|uint|Address to start printing from|
+|LimitBytes|int|Limit the number of bytes printed|
 
 ## CLI Usage
 Install the latest version of __gohexd__ with:
@@ -28,3 +30,5 @@ Optionally you can provide the following options:
 |--print-byte-separator|-s|flag|Print a space between bytes|
 |--bytes-per-line|-b|int|Number of bytes to print per line|
 |--address-bytes||int|Number of bytes to use for displaying the address|
+|--start-address||uint|Address to start printing from|
+|--limit-bytes|-l|int|Limit the number of bytes printed|

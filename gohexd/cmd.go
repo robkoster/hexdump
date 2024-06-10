@@ -20,6 +20,8 @@ var HexdumpCmd = &cobra.Command{
 		opts.ShowByteSeparator, _ = cmd.Flags().GetBool("print-byte-separator")
 		opts.BytesPerLine, _ = cmd.Flags().GetInt("bytes-per-line")
 		opts.AddressBytes, _ = cmd.Flags().GetInt("address-bytes")
+		opts.StartAddress, _ = cmd.Flags().GetUint64("start-address")
+		opts.LimitBytes, _ = cmd.Flags().GetInt64("limit-bytes")
 		err := hexdump.Dump(args[0], os.Stdout, opts)
 		if err != nil {
 			panic(err)
@@ -33,4 +35,6 @@ func init() {
 	HexdumpCmd.Flags().BoolP("print-byte-separator", "s", true, "Print a separator between bytes")
 	HexdumpCmd.Flags().IntP("bytes-per-line", "b", 16, "The number of bytes to print on a single line (minimum 4)")
 	HexdumpCmd.Flags().Int("address-bytes", 7, "The number of bytes to use for displaying the address (minimum 4)")
+	HexdumpCmd.Flags().Uint64("start-address", 0, "Start printing from the given address")
+	HexdumpCmd.Flags().Int64P("limit-bytes", "l", -1, "Limit the number of printed bytes. -1 to print everything")
 }

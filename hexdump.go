@@ -4,12 +4,15 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"math"
 	"os"
 	"strings"
 )
 
-const MinimumAdressBytes = 4
-const MinimumBytesPerLine = 1
+const (
+	MinimumAdressBytes  = 4
+	MinimumBytesPerLine = 1
+)
 
 type HexDumpOptions struct {
 	ShowHeader        bool
@@ -17,6 +20,8 @@ type HexDumpOptions struct {
 	ShowByteSeparator bool
 	BytesPerLine      int
 	AddressBytes      int
+	StartAddress      uint64
+	LimitBytes        int64
 }
 
 var DefaultOptions = HexDumpOptions{
@@ -25,6 +30,8 @@ var DefaultOptions = HexDumpOptions{
 	ShowByteSeparator: true,
 	BytesPerLine:      16,
 	AddressBytes:      7,
+	StartAddress:      0,
+	LimitBytes:        -1,
 }
 
 // Open the file and write a Hex Dump to the Writer w.
@@ -37,6 +44,9 @@ func Dump(filename string, w io.Writer, options ...HexDumpOptions) error {
 	}
 	if len(options) != 0 {
 		opts = options[0]
+	}
+	if opts.LimitBytes == -1 {
+		opts.LimitBytes = math.MaxInt64
 	}
 	if opts.AddressBytes < MinimumAdressBytes {
 		return fmt.Errorf("address bytes should be at least %d, given %d", MinimumAdressBytes, opts.AddressBytes)
@@ -75,9 +85,16 @@ func Dump(filename string, w io.Writer, options ...HexDumpOptions) error {
 	if opts.ShowByteSeparator {
 		byteSep = " "
 	}
+
+	// Skip upto start address
+	startAddr, err := f.Seek(int64(opts.StartAddress), 0)
+	if err != nil {
+		return err
+	}
+
 	// Read one line at a time and write it to the given io.Writer
 	buf := make([]byte, opts.BytesPerLine)
-	addr := 0
+	addr := startAddr
 	for {
 		n, err := f.Read(buf)
 		if err != nil {
@@ -87,6 +104,17 @@ func Dump(filename string, w io.Writer, options ...HexDumpOptions) error {
 			return err
 		}
 
+		// Adjust the end based on the maximum number of bytes to read
+		bytesRead := addr - startAddr
+		diff := int(bytesRead + int64(n) - opts.LimitBytes)
+		if diff > 0 {
+			n -= diff
+		}
+		// Nothing left, we can immediately stop
+		if n <= 0 {
+			break
+		}
+
 		// Print the address
 		if opts.ShowAddress {
 			fmt.Fprintf(w, "%0*x ", opts.AddressBytes, addr)
@@ -94,8 +122,8 @@ func Dump(filename string, w io.Writer, options ...HexDumpOptions) error {
 		// Print the bytes
 		for i := range n {
 			fmt.Fprintf(w, "%02x%s", buf[i], byteSep)
+			addr++
 		}
-		addr += opts.BytesPerLine
 		fmt.Fprintln(w)
 	}
 	return nil

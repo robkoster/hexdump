@@ -7,8 +7,8 @@ import (
 )
 
 func Execute() {
-
-	err := gohexd.HexdumpCmd.Execute()
+	cmd := gohexd.InitializeHexDumpCmd()
+	err := cmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}

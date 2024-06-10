@@ -13,7 +13,7 @@ var HexdumpCmd = &cobra.Command{
 	Short: "Show a hexdump for the specified file",
 	Long:  `Display a hexdump for the specified file. Display format can be modified by setting the corresponding flags`,
 	Args:  cobra.ExactArgs(1),
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		opts := hexdump.DefaultOptions
 		opts.ShowHeader, _ = cmd.Flags().GetBool("display-header")
 		opts.ShowAddress, _ = cmd.Flags().GetBool("display-address")
@@ -22,10 +22,11 @@ var HexdumpCmd = &cobra.Command{
 		opts.AddressBytes, _ = cmd.Flags().GetInt("address-bytes")
 		opts.StartAddress, _ = cmd.Flags().GetUint64("start-address")
 		opts.LimitBytes, _ = cmd.Flags().GetInt64("limit-bytes")
-		err := hexdump.Dump(args[0], os.Stdout, opts)
-		if err != nil {
-			panic(err)
+
+		if err := hexdump.Dump(args[0], os.Stdout, opts); err != nil {
+			return err
 		}
+		return nil
 	},
 }
 
